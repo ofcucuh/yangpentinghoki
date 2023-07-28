@@ -1,0 +1,348 @@
+'use client'
+import * as React from 'react'
+import CssBaseline from '@mui/material/CssBaseline'
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode'
+import Container from '@mui/material/Container'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
+import { motion } from 'framer-motion'
+import { createTheme, ThemeProvider } from '@mui/material/styles'
+import Background from './background'
+
+function Copyright() {
+  return (
+      <Grid container item position={'fixed'} bottom={'2%'} left={'5%'} xs={12} sx={{
+          backgroundColor: '#000',
+          padding: '1rem',
+          borderRadius: '0.5rem',
+        }} >
+          <Typography  variant='body2' color='#FFF' align='center'>
+              {'Created by Kukuh from Develover.'}
+          </Typography>
+      </Grid>
+  )
+}
+
+const defaultTheme = createTheme({
+  typography: {
+    body1: {
+      color: '#FFF',
+    },
+  },
+});
+
+export default function Birthday() {
+  const html5QrCodeRef = React.useRef(null)
+  const [cameraStatus, setCameraStatus] = React.useState(false)
+  const [scannerInitialized, setScannerInitialized] = React.useState(false)
+  const [cameraTransition, setCameraTransition] = React.useState(false)
+  const scannerOngoingRef = React.useRef(false)
+  const [openDialog, setOpenDialog] = React.useState(false)
+  const [message, setMessage] = React.useState('')
+  const [albumDialog, setAlbumDialog] = React.useState(false)
+
+  const startScanner = () => {
+    const html5QrCode = new Html5Qrcode('reader', {
+      formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+    })
+  
+    const qrCodeSuccessCallback = async (decodedText, decodedResult) => {
+      // const msg = await callUpdate({ id_generate_qr_detail: decodedText, discount: diskonRef.current })
+      console.log(decodedText)
+      if(decodedText==='https://buatpinaya.vercel.app/' || decodedText==='https://qr.net/GLTfmR'){
+        setMessage('Nah Gitu Dong')
+    
+        setOpenDialog(true)
+        setTimeout(() => {
+          setOpenDialog(false)
+          setAlbumDialog(true)
+          
+        }, 1000)
+      }else{
+        setMessage('Bosqu Itu QR CODE APAAN?')
+        setOpenDialog(true)
+        setTimeout(() => {
+          setOpenDialog(false)
+          
+        }, 1000)
+      }
+    }
+  
+    const config = { fps: 5, qrbox: { width: 500, height: 500 } }
+  
+    html5QrCode.start({ facingMode: 'environment' }, config, qrCodeSuccessCallback)
+  
+    html5QrCodeRef.current = html5QrCode // Store the scanner instance
+    scannerOngoingRef.current = true // Set the scanner status flag
+    setCameraTransition(true) // Update the camera transition state
+    setCameraStatus(true) // Update the camera status
+  }
+
+  const stopScanner = () => {
+    if (html5QrCodeRef.current && scannerOngoingRef.current) {
+      html5QrCodeRef.current.stop()
+      scannerOngoingRef.current = false // Set the scanner status flag
+      setCameraTransition(true) // Update the camera transition state
+      setCameraStatus(false) // Update the camera status
+    }
+  }
+  
+  const handleCameraButtonClick = () => {
+    if (cameraStatus) {
+      // Close the camera
+      stopScanner()
+    } else {
+      // Open the camera
+      startScanner()
+    }
+  }
+  
+  const setCloseButton = () => {
+    setAlbumDialog(false)
+
+  }
+
+  React.useEffect(() => {
+    if (cameraTransition) {
+      // Delay the reset of cameraTransition to allow transition completion
+      setTimeout(() => {
+        setCameraTransition(false)
+      }, 500)
+    }
+  }, [cameraTransition])
+
+  React.useEffect(() => {
+    setScannerInitialized(true) // Mark the scanner as initialized
+  }, [])
+
+  React.useEffect(() => {
+    if (scannerInitialized && openDialog) {
+      // Close the scanner when the dialog is open
+      stopScanner()
+    }
+  }, [openDialog, scannerInitialized])
+
+
+  return (
+    <ThemeProvider theme={defaultTheme}>
+      <CssBaseline />
+      <Container component='main' maxWidth='sm' sx={{ mb: 6}}> 
+        <Background />
+        <Grid sx={{ my: { xs: 6, md: 6 }, p: { xs: 3, md: 3 } }} padding={4}>
+          <Grid alignItems='center' item xs={6} marginBottom={8}>
+          <Typography component='h1' variant='h4' align='center'>
+            {'Hello Anytime'}
+          </Typography>
+          <Typography align='center' marginTop={2}>
+            {'Scan QR-Code tadi disini'}
+          </Typography>
+          </Grid>
+          <Grid alignItems='center' item xs={6}>
+            <center>
+            <motion.div
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            >
+              <Button
+                onClick={handleCameraButtonClick}
+                disabled={!scannerInitialized || cameraTransition}
+                color='inherit'
+              >
+                {cameraStatus ? 'Close It' : 'Click Me'}
+              </Button>
+            </motion.div>
+            </center>
+          </Grid>
+          <Grid alignItems='center' container spacing={2} padding={4} justifyContent='center'>
+            <Grid item xs={12}>
+              <div id='reader'></div>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Dialog open={openDialog} onClose={() => {
+          setOpenDialog(false)
+          // setAlbumDialog(true)
+        }
+        }>
+        <DialogContent>
+          <h4>{message}</h4>
+        </DialogContent>
+      </Dialog>
+      <Grid>
+        <Dialog open={albumDialog} onClose={() => setAlbumDialog(true)} fullWidth={true}
+          PaperProps={{
+            style: {
+              backgroundColor: '#4c727e'
+            },
+          }}
+        >
+          <DialogContent>
+            <Grid container item justifyContent={'end'} alignItems={'center'}>
+              <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{
+                    duration: 0.8,
+                    delay: 17,
+                    ease: [0, 0.71, 0.2, 2]
+                  }}
+                >
+                <Button color='inherit' onClick={setCloseButton}> x </Button>
+              </motion.div>
+            </Grid>
+            <Grid container item justifyContent={'left'} alignItems={'center'}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 0.5,
+                  ease: [0, 0.71, 0.2, 1.5]
+                }}
+              >
+                <Typography align='justify'>
+                  {'Pinaya Agustin ❤️'}
+                </Typography>
+              </motion.div>
+            </Grid>
+            <Grid container item justifyContent={'left'} alignItems={'center'}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 2.5,
+                  ease: [0, 0.71, 0.2, 1.5]
+                }}
+              >
+                <Typography align='justify'>
+                  {'Ini adalah hari spesial kamu!'}
+                </Typography>
+              </motion.div>
+            </Grid>
+            <Grid container item justifyContent={'left'} alignItems={'center'}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 4.5,
+                  ease: [0, 0.71, 0.2, 1.5]
+                }}
+              >
+                <Typography align='justify' >
+                  {'Kekasihku'}
+                </Typography>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 4.6,
+                  ease: [0, 0.71, 0.2, 1.5]
+                }}
+              >
+                <Typography align='justify' paddingLeft={0.5}>
+                  {'ini'}
+                </Typography>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 4.7,
+                  ease: [0, 0.71, 0.2, 1.5]
+                }}
+              >
+                <Typography align='justify' paddingLeft={0.5}>
+                  {'udah'}
+                </Typography>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 4.8,
+                  ease: [0, 0.71, 0.2, 1.5]
+                }}
+              >
+                <Typography align='justify' paddingLeft={0.5}>
+                  {'24 Tahun'}
+                </Typography>
+              </motion.div>
+            </Grid>
+            <Grid container item justifyContent={'left'} alignItems={'center'}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 6.8,
+                  ease: [0, 0.71, 0.2, 1.5]
+                }}
+              >
+                <Typography align='justify'>
+                  {'Selama 24 tahun, kamu udah kuat menjalani semua cobaan dalam hidup, I\'m so proud of you'}
+                </Typography>
+              </motion.div>
+            </Grid>
+            <Grid container item justifyContent={'left'} alignItems={'center'}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 12,
+                  ease: [0, 0.71, 0.2, 1.5]
+                }}
+              >
+                <Typography align='justify'>
+                  {'Kedepannya tetep kuat ya!'}
+                </Typography>
+              </motion.div>
+            </Grid>
+            <Grid container item justifyContent={'left'} alignItems={'center'}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 14,
+                  ease: [0, 0.71, 0.2, 1.5]
+                }}
+              >
+                <Typography align='justify'>
+                  {'Karena kamu sama aku'}
+                </Typography>
+              </motion.div>
+            </Grid>
+            <Grid container item justifyContent={'right'} alignItems={'center'}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 16.9,
+                  ease: [0, 0.71, 0.2, 1.5]
+                }}
+              >
+                <Typography align='justify'>
+                  {'- Kukuh'}
+                </Typography>
+              </motion.div>
+            </Grid>
+          </DialogContent>
+        </Dialog>
+      </Grid>
+      </Container>
+      <Copyright />
+    </ThemeProvider>
+  )
+}
