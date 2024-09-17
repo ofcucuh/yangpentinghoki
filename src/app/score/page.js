@@ -33,7 +33,7 @@ function Copyright() {
                 borderRadius: '0.5rem'
             }}>
             <Typography variant='body2' color='#FFF' align='center'>
-                {'Created by Kukuh from Develover.'}
+                {'Created by Develover.'}
             </Typography>
         </Grid>
     )

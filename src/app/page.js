@@ -70,7 +70,7 @@ export default function HomeScreen() {
                     borderRadius: '0.5rem'
                 }}>
                 <Typography variant='body2' color='#FFF' align='center'>
-                    {'Created by Kukuh from Develover.'}
+                    {'Created by Develover.'}
                 </Typography>
             </Grid>
         )
@@ -78,13 +78,22 @@ export default function HomeScreen() {
 
     function Before() {
         const [text, setText] = React.useState('CERDAS CERMAT?')
-
+        const [openDialogHowTo,setOpenDialogHowTo] = React.useState(false)
+        const handleHowTo = () => {
+            setOpenDialogHowTo(true)
+            // setShowBefore(false)
+            // setShowPertanyaan(true)
+        }
         const handleMulai = () => {
+            setOpenDialogHowTo(false)
             setShowBefore(false)
             setShowPertanyaan(true)
         }
         const handleCekScore = () => {
             router.push('/score')
+        }
+        const handleAbout = () => {
+            router.push('/about')
         }
         React.useEffect(() => {
             const animationSequence = async () => {
@@ -118,7 +127,7 @@ export default function HomeScreen() {
                         md: 3
                     }
                 }}>
-                <Grid item xs={12} marginTop={'25%'}>
+                <Grid item xs={12} marginTop={'5%'}>
                     <AnimatedComponent element='div'>
                         <Typography
                             sx={{
@@ -130,9 +139,9 @@ export default function HomeScreen() {
                         </Typography>
                     </AnimatedComponent>
                 </Grid>
-                <Grid item xs={12} marginTop={'35%'}>
+                <Grid item xs={12} marginTop={'20%'}>
                     <AnimatedComponent element='div' alignItems='center' delay={4}>
-                        <Button onClick={handleMulai} color='inherit' fullWidth={true}>
+                        <Button onClick={handleHowTo} color='inherit' fullWidth={true}>
                             <Typography
                                 sx={{
                                     fontFamily: 'Amatic SC'
@@ -144,7 +153,7 @@ export default function HomeScreen() {
                         </Button>
                     </AnimatedComponent>
                 </Grid>
-                <Grid item xs={12} marginTop={'10%'}>
+                {/* <Grid item xs={12} marginTop={'10%'}>
                     <AnimatedComponent element='div' alignItems='center' delay={4.5}>
                         <Button onClick={handleCekScore} color='inherit' fullWidth={true}>
                             <Typography
@@ -157,16 +166,74 @@ export default function HomeScreen() {
                             </Typography>
                         </Button>
                     </AnimatedComponent>
+                </Grid> */}
+                <Grid item xs={12} marginTop={'10%'}>
+                    <AnimatedComponent element='div' alignItems='center' delay={5}>
+                        <Button onClick={handleAbout} color='inherit' fullWidth={true}>
+                            <Typography
+                                sx={{
+                                    fontFamily: 'Amatic SC'
+                                }}
+                                variant='h5'
+                                align='center'>
+                                About
+                            </Typography>
+                        </Button>
+                    </AnimatedComponent>
                 </Grid>
+                <Dialog
+                    open={openDialogHowTo}
+                    onClose={() => {
+                        setOpenDialogHowTo(true)
+                    }
+}>
+                    <DialogContent>
+                        <Typography sx={{
+                                    fontFamily: 'Exo'
+                                }}
+                                variant='body'
+                                align='justify'>
+                            Dari 100 Pertanyaan cuma ada 10 yang akan ditampilkan dalam game ini secara acak!<br/>
+                            Waktu menjawab 1 pertanyaan adalah 15 detik.<br/>
+                            Kamu harus menjawab pertanyaan dengan benar. <br/>
+                            Jika jawaban benar, kamu akan dapat poin 1 - 5 secara acak. <br/>
+                            Probabilitas poin 1 paling tinggi, sementara poin 5 paling rendah.(semoga kamu hoki) <br/>
+                            Pertanyaan bisa saja sama, jadi semoga beruntung ya!.<br/>
+                        </Typography>
+                        <AnimatedComponent element='div' alignItems='center' delay={2}>
+                            <Button onClick={handleMulai} color='inherit' fullWidth={true}>
+                                <Typography
+                                    sx={{
+                                        fontFamily: 'Exo'
+                                    }}
+                                    variant='h5'
+                                    align='center'>
+                                    OKE GAS!
+                                </Typography>
+                            </Button>
+                        </AnimatedComponent>
+                    </DialogContent>
+                </Dialog>
             </Grid>
         )
     }
 
     const getData = async (param) => {
         try {
-            const retVal = await ApiClient.callGet(
-                '/generate?id=' + param.id + '&type=' + param.type
-            )
+            const id = param.id!==null?param.id:null
+            const type = param.type!==null?param.type:null
+            const all = param.all!==null?param.all:null
+            let url = '/generate?'
+            if(id){
+                url = url + '&id=' + id
+            }
+            if(type){
+                url = url + '&type='+ type
+            }
+            if(all){
+                url = url + '&all=' + all
+            }
+            const retVal = await ApiClient.callGet(url)
             return retVal
         } catch (error) {
             console.log(error)
@@ -196,24 +263,45 @@ export default function HomeScreen() {
 
     function ShowNama() {
         const [nama, setNama] = React.useState('')
+        const [msgOpen, setMsgOpen] = React.useState()
+        const [openDialog, setOpenDialog] = React.useState(false)
 
         const handleInputChange = (event, set) => {
             set(event)
         }
         const handleSubmit = async () => {
-            const uid = uuid()
-            const param = {
-                "nama": nama,
-                "score": score,
-                "uid": uid
-            }
-            const retVal = await sendData({hasil: param})
-            // console.log(retVal)
-            if (retVal) {
-                // setTimeout(() => {
-                    router.push('/score')
-                // }, 2000);
-            }
+            // const uid = uuid()
+            // const param = {
+            //     "nama": nama,
+            //     "score": score,
+            //     "uid": uid
+            // }
+            // const hasilAll = await getData({all:"all"})
+            // let process = 0
+            // hasilAll.every(element => {
+            //     const text = element.value.nama.replace('@','')
+            //     if(text.toLowerCase() === nama.toLowerCase()){
+            //         setOpenDialog(true)
+            //         setMsgOpen("@Instagram Sudah Ada")
+            //         process = 0
+            //         return false
+            //     }
+            //     process = 1
+            //     return true
+            // })
+
+            // if(process===1){
+                // console.log("masuk")
+                // const retVal = await sendData({hasil: param})
+                // console.log(retVal)
+                setOpenDialog(true)
+                setMsgOpen("Skor kamu adalah "+ score)
+                // if (retVal) {
+                //     // setTimeout(() => {
+                //         router.push('/score')
+                //     // }, 2000);
+                // }
+            // }
         }
         return (
             <Grid
@@ -231,15 +319,15 @@ export default function HomeScreen() {
                         md: 3
                     }
                 }}>
-                <Grid item xs={12} marginTop={'25%'}>
+                <Grid item xs={12} marginTop={'10%'}>
                     <AnimatedComponent element='div' delay={1}>
                         <Typography
                             sx={{
                                 fontFamily: 'Poppins'
                             }}
-                            variant='h5'
+                            variant='h3'
                             align='center'>
-                            {'Total Score Kamu: ' + score}
+                            {'Game Over!'}
                         </Typography>
                     </AnimatedComponent>
                     <AnimatedComponent element='div' delay={1.5}>
@@ -247,19 +335,20 @@ export default function HomeScreen() {
                             sx={{
                                 fontFamily: 'Poppins'
                             }}
-                            variant='h5'
-                            align='center'>
-                            {'Masukin nama kamu ya, biar kecatat'}
+                            variant='h6'
+                            align='center'
+                            marginTop={'5%'}>
+                            {'Klik Submit untuk lihat skornya!'}
                         </Typography>
                     </AnimatedComponent>
                 </Grid>
-                <Grid item xs={12} marginTop={'20%'}>
+                <Grid item xs={12} marginTop={'10%'}>
                     <Grid container alignItems={'center'} justifyContent={'center'}>
-                        <Grid item xs={10}>
+                        {/* <Grid item xs={10}>
                             <AnimatedComponent element='div' alignItems='center' delay={2}>
                                 <TextField
                                     required
-                                    label='Nama'
+                                    label='@Instagram'
                                     fullWidth={true}
                                     sx={{
                                         fontFamily: 'Poppins'
@@ -270,10 +359,10 @@ export default function HomeScreen() {
                                     onChange={e => handleInputChange(e.target.value, setNama)}
                                     value={nama}/>
                             </AnimatedComponent>
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={8} marginTop={'5%'}>
-                            {
-                                nama && (
+                            
+                                
                                     <AnimatedComponent element='div' alignItems='center'>
                                         <Button fullWidth={true} color='inherit' onClick={() => handleSubmit()}>
                                             <Typography
@@ -286,12 +375,70 @@ export default function HomeScreen() {
                                             </Typography>
                                         </Button>
                                     </AnimatedComponent>
-                                )
-                            }
+                                
+                            
                         </Grid>
                     </Grid>
                 </Grid>
+                <Dialog
+                    open={openDialog}
+                    onClose={() => {
+                        setOpenDialog(true)
+                    }
+                }>
+                    <DialogContent>
+                        <h5>{msgOpen}</h5>
+                        <Button fullWidth onClick={()=>setOpenDialog(false)}>Close</Button>
+                    </DialogContent>
+                </Dialog>
             </Grid>
+        )
+    }
+
+    function Countdown() {
+        const [time,setTime] = React.useState(15)
+        const [msgOpen, setMsgOpen] = React.useState()
+        const [openDialog, setOpenDialog] = React.useState(false)
+
+        React.useEffect(() => {
+            if(time>0)
+            setTimeout(() => {
+                setTime(time-1)
+            }, 1000)
+            if(time === 0){
+                setMsgOpen('Waktu menjawab habis!')
+                setOpenDialog(true)
+                setTimeout(() => {
+                    setRound(round + 1)
+                }, 2700)
+            }
+        })
+
+        return(
+                <Grid
+                // container
+                item
+                // xs={12}
+                sx={{
+                    // backgroundColor: '#1e3240',
+                    padding: '1rem',
+                    borderRadius: '0.5rem'
+                }}
+                >
+                    {/* <Grid item marginBottom={'5%'}> */}
+                        Sisa Waktu: {time}
+                    {/* </Grid> */}
+                    <Dialog
+                        open={openDialog}
+                        onClose={() => {
+                            setOpenDialog(true)
+                        }
+                    }>
+                        <DialogContent>
+                            <h5>{msgOpen}</h5>
+                        </DialogContent>
+                    </Dialog>
+                </Grid>
         )
     }
 
@@ -301,19 +448,19 @@ export default function HomeScreen() {
         const [options, setOptions] = React.useState([])
         const [msgOpen, setMsgOpen] = React.useState()
         const [openDialog, setOpenDialog] = React.useState(false)
-
+        const [showCountdown,setShowCountdown] = React.useState(true)
         React.useEffect(() => {
             const fetchData = async () => {
                 let randomize
-                randomize = Math.floor(Math.random() * 30) + 1
+                randomize = Math.floor(Math.random() * 50) + 1
                 setRandom(randomize)
                 // if(cacheRandom!==randomize){
                 //     setCacheRandom(randomize)
                 // }
                 try {
                     const dataQuestion = await getData({id: randomize, type: 'pertanyaan'})
-                    setQuestion(dataQuestion)
                     const dataOption = await getData({id: randomize, type: 'opsi'})
+                    setQuestion(dataQuestion)
                     setOptions(shuffleValues(dataOption))
                 } catch (error) {
                     console.error('Error fetching data:', error)
@@ -323,6 +470,7 @@ export default function HomeScreen() {
         }, [round])
 
         const handleJawab = async (value) => {
+            setShowCountdown(false)
             const hasil = await sendData({jawaban: value, id: random})
             let probabilitas1to5 = 0;
             if (hasil) {
@@ -338,16 +486,18 @@ export default function HomeScreen() {
                 } else {
                     probabilitas1to5 = 5;
                 }
-                setMsgOpen('Selamat Kamu Dapet Score: ' + probabilitas1to5)
+                setMsgOpen('Selamat Kamu Dapet: ' + probabilitas1to5 + ' Poin')
                 setOpenDialog(true)
             } else {
-                setMsgOpen('Sayang sekali jawaban kamu salah!')
+                const jawaban = await getData({id: random,type:'jawaban'})
+                // console.log(jawaban)
+                setMsgOpen('Sayang sekali jawaban kamu salah! Jawabannya adalah '+jawaban)
                 setOpenDialog(true)
             }
             setTimeout(() => {
                 setScore(score + probabilitas1to5)
                 setRound(round + 1)
-            }, 3500);
+            }, 3000);
         }
 
         return (
@@ -374,11 +524,17 @@ export default function HomeScreen() {
                             }}
                             variant='h5'
                             align='center'>
-                            {question}
+                            {question && round+1+'. '+question}
                         </Typography>
                     </AnimatedComponent>
                 </Grid>
-                <Grid item xs={12} marginTop={'40%'}>
+                {options.A !=null && (
+                <Grid item xs={12} marginTop={'25%'}>
+                    <Grid container item justifyContent={'center'} alignItems={'center'} marginBottom={'10%'}>
+                        <AnimatedComponent element={'div'} delay={0}>
+                            {showCountdown && <Countdown/>}
+                        </AnimatedComponent>
+                    </Grid>
                     <Grid container>
                         <Grid item xs={6}>
                             <AnimatedComponent element='div' delay={1}>
@@ -388,7 +544,7 @@ export default function HomeScreen() {
                                             fontFamily: 'Amatic SC'
                                         }}
                                         align='center'
-                                        variant='h6'>
+                                        variant='h5'>
                                         A. {options.A}
                                     </Typography>
                                 </Button>
@@ -402,7 +558,7 @@ export default function HomeScreen() {
                                             fontFamily: 'Amatic SC'
                                         }}
                                         align='center'
-                                        variant='h6'>
+                                        variant='h5'>
                                         B. {options.B}
                                     </Typography>
                                 </Button>
@@ -418,7 +574,7 @@ export default function HomeScreen() {
                                             fontFamily: 'Amatic SC'
                                         }}
                                         align='center'
-                                        variant='h6'>
+                                        variant='h5'>
                                         C. {options.C}
                                     </Typography>
                                 </Button>
@@ -432,20 +588,20 @@ export default function HomeScreen() {
                                             fontFamily: 'Amatic SC'
                                         }}
                                         align='center'
-                                        variant='h6'>
+                                        variant='h5'>
                                         D. {options.D}
                                     </Typography>
                                 </Button>
                             </AnimatedComponent>
                         </Grid>
                     </Grid>
-                </Grid>
+                </Grid> ) }
                 <Dialog
                     open={openDialog}
                     onClose={() => {
                         setOpenDialog(true)
                     }
-}>
+                }>
                     <DialogContent>
                         <h5>{msgOpen}</h5>
                     </DialogContent>
@@ -469,7 +625,8 @@ export default function HomeScreen() {
                 sx={{
                     mb: 6
                 }}>
-                <Background/> {showBefore && <Before/>}
+                <Background/> 
+                {showBefore && <Before/>}
                 {showPertanyaan && round < 10 && <Pertanyaan/>}
                 {round >= 10 && <ShowNama/>}
             </Container>

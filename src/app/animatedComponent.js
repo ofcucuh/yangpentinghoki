@@ -7,7 +7,7 @@ const AnimatedComponent = ({ element, children, delay }) => {
     transition: {
       duration: 1,
       delay: delay,
-      ease: [0, 1.5, 0.7, 1.2]
+      ease: [0, 2, 0.7, 1.2]
     }
   };
 

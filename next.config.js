@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     env: {
-        token: 'hENiw6wFEDAwtzKZsIdLwhVz'
+        token: process.env.S3_BUCKET
     },
     optimizeFonts: false,
 }
